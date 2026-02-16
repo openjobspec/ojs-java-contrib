@@ -1,0 +1,9 @@
+server:
+  port: 8081
+
+ojs:
+  url: http://localhost:8080
+  queues:
+    - default
+    - email
+  concurrency: 5
