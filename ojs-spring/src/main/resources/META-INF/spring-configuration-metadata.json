@@ -1,0 +1,35 @@
+{
+  "groups": [
+    {
+      "name": "ojs",
+      "type": "org.openjobspec.spring.OjsProperties",
+      "sourceType": "org.openjobspec.spring.OjsProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "ojs.url",
+      "type": "java.lang.String",
+      "description": "OJS backend URL.",
+      "defaultValue": "http://localhost:8080"
+    },
+    {
+      "name": "ojs.queues",
+      "type": "java.util.List<java.lang.String>",
+      "description": "Queues the worker should poll.",
+      "defaultValue": ["default"]
+    },
+    {
+      "name": "ojs.concurrency",
+      "type": "java.lang.Integer",
+      "description": "Worker concurrency (number of virtual threads processing jobs).",
+      "defaultValue": 10
+    },
+    {
+      "name": "ojs.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable or disable OJS auto-configuration.",
+      "defaultValue": true
+    }
+  ]
+}
