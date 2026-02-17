@@ -1,0 +1,31 @@
+{
+  "properties": [
+    {
+      "name": "ojs.url",
+      "type": "java.lang.String",
+      "description": "OJS backend URL.",
+      "defaultValue": "http://localhost:8080"
+    },
+    {
+      "name": "ojs.default-queue",
+      "type": "java.lang.String",
+      "description": "Default queue for enqueued jobs.",
+      "defaultValue": "default"
+    },
+    {
+      "name": "ojs.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable or disable OJS auto-configuration.",
+      "defaultValue": true
+    }
+  ],
+  "hints": [
+    {
+      "name": "ojs.retry.backoff",
+      "values": [
+        { "value": "exponential", "description": "Exponential backoff with jitter." },
+        { "value": "fixed", "description": "Fixed interval between retries." }
+      ]
+    }
+  ]
+}

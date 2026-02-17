@@ -4,6 +4,18 @@
       "name": "ojs",
       "type": "org.openjobspec.spring.OjsProperties",
       "sourceType": "org.openjobspec.spring.OjsProperties"
+    },
+    {
+      "name": "ojs.worker",
+      "type": "org.openjobspec.spring.OjsProperties$Worker",
+      "sourceType": "org.openjobspec.spring.OjsProperties",
+      "sourceMethod": "getWorker()"
+    },
+    {
+      "name": "ojs.retry",
+      "type": "org.openjobspec.spring.OjsProperties$Retry",
+      "sourceType": "org.openjobspec.spring.OjsProperties",
+      "sourceMethod": "getRetry()"
     }
   ],
   "properties": [
@@ -14,15 +26,21 @@
       "defaultValue": "http://localhost:8080"
     },
     {
+      "name": "ojs.default-queue",
+      "type": "java.lang.String",
+      "description": "Default queue for enqueued jobs.",
+      "defaultValue": "default"
+    },
+    {
       "name": "ojs.queues",
       "type": "java.util.List<java.lang.String>",
-      "description": "Queues the worker should poll.",
+      "description": "Queues the worker should poll (shorthand for ojs.worker.queues).",
       "defaultValue": ["default"]
     },
     {
       "name": "ojs.concurrency",
       "type": "java.lang.Integer",
-      "description": "Worker concurrency (number of virtual threads processing jobs).",
+      "description": "Worker concurrency (shorthand for ojs.worker.concurrency).",
       "defaultValue": 10
     },
     {
@@ -30,6 +48,39 @@
       "type": "java.lang.Boolean",
       "description": "Enable or disable OJS auto-configuration.",
       "defaultValue": true
+    },
+    {
+      "name": "ojs.worker.concurrency",
+      "type": "java.lang.Integer",
+      "description": "Number of virtual threads processing jobs concurrently.",
+      "defaultValue": 0
+    },
+    {
+      "name": "ojs.worker.queues",
+      "type": "java.util.List<java.lang.String>",
+      "description": "Queues the worker should poll.",
+      "defaultValue": []
+    },
+    {
+      "name": "ojs.retry.max-attempts",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of retry attempts.",
+      "defaultValue": 3
+    },
+    {
+      "name": "ojs.retry.backoff",
+      "type": "java.lang.String",
+      "description": "Backoff strategy: 'exponential' or 'fixed'.",
+      "defaultValue": "exponential"
+    }
+  ],
+  "hints": [
+    {
+      "name": "ojs.retry.backoff",
+      "values": [
+        { "value": "exponential", "description": "Exponential backoff with jitter." },
+        { "value": "fixed", "description": "Fixed interval between retries." }
+      ]
     }
   ]
 }
