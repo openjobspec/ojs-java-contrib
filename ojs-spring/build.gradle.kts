@@ -11,7 +11,10 @@ dependencies {
 
     compileOnly("org.springframework.boot:spring-boot-actuator:${property("springBootVersion")}")
     compileOnly("org.springframework:spring-tx:6.1.8")
+    compileOnly("io.micrometer:micrometer-core:1.13.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test:${property("springBootVersion")}")
+    testImplementation("org.springframework.boot:spring-boot-actuator:${property("springBootVersion")}")
     testImplementation("org.springframework:spring-tx:6.1.8")
+    testImplementation("io.micrometer:micrometer-core:1.13.0")
 }
