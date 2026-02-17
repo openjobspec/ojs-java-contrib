@@ -57,4 +57,73 @@ class OjsAutoConfigurationTest {
                 .withPropertyValues("ojs.url=http://localhost:8080")
                 .run(ctx -> assertTrue(ctx.containsBean("ojsJobRegistrar")));
     }
+
+    @Test
+    void registersOjsTemplate() {
+        contextRunner
+                .withPropertyValues("ojs.url=http://localhost:8080")
+                .run(ctx -> {
+                    assertTrue(ctx.containsBean("ojsTemplate"));
+                    assertInstanceOf(OjsTemplate.class, ctx.getBean("ojsTemplate"));
+                });
+    }
+
+    @Test
+    void templateUsesDefaultQueue() {
+        contextRunner
+                .withPropertyValues(
+                        "ojs.url=http://localhost:8080",
+                        "ojs.default-queue=emails"
+                )
+                .run(ctx -> {
+                    var props = ctx.getBean(OjsProperties.class);
+                    assertEquals("emails", props.getDefaultQueue());
+                });
+    }
+
+    @Test
+    void respectsNestedWorkerProperties() {
+        contextRunner
+                .withPropertyValues(
+                        "ojs.url=http://localhost:8080",
+                        "ojs.worker.concurrency=32",
+                        "ojs.worker.queues=critical,background"
+                )
+                .run(ctx -> {
+                    var props = ctx.getBean(OjsProperties.class);
+                    assertEquals(32, props.getWorker().getConcurrency());
+                    assertEquals(32, props.resolvedConcurrency());
+                    assertEquals(2, props.resolvedQueues().size());
+                    assertTrue(props.resolvedQueues().contains("critical"));
+                });
+    }
+
+    @Test
+    void respectsRetryProperties() {
+        contextRunner
+                .withPropertyValues(
+                        "ojs.url=http://localhost:8080",
+                        "ojs.retry.max-attempts=5",
+                        "ojs.retry.backoff=fixed"
+                )
+                .run(ctx -> {
+                    var props = ctx.getBean(OjsProperties.class);
+                    assertEquals(5, props.getRetry().getMaxAttempts());
+                    assertEquals("fixed", props.getRetry().getBackoff());
+                });
+    }
+
+    @Test
+    void topLevelQueuesUsedWhenWorkerQueuesEmpty() {
+        contextRunner
+                .withPropertyValues(
+                        "ojs.url=http://localhost:8080",
+                        "ojs.queues=alpha,beta"
+                )
+                .run(ctx -> {
+                    var props = ctx.getBean(OjsProperties.class);
+                    assertEquals(2, props.resolvedQueues().size());
+                    assertTrue(props.resolvedQueues().contains("alpha"));
+                });
+    }
 }
