@@ -28,3 +28,7 @@ jobs:
 
       - name: Test ${{ matrix.module }}
         run: ./gradlew :${{ matrix.module }}:test
+
+      - name: Dependency check ${{ matrix.module }}
+        run: ./gradlew :${{ matrix.module }}:dependencyCheckAnalyze
+        continue-on-error: true
