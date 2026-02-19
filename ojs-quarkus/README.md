@@ -12,7 +12,7 @@ CDI extension for [Open Job Spec](https://github.com/openjobspec/ojs-java-sdk) w
 ## Installation
 
 ```kotlin
-implementation("org.openjobspec:ojs-quarkus:0.1.0")
+implementation("org.openjobspec:ojs-quarkus:0.9.0")
 ```
 
 ## Quick Start

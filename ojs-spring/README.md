@@ -21,14 +21,14 @@ Auto-configuration starter for [Open Job Spec](https://github.com/openjobspec/oj
 <dependency>
     <groupId>org.openjobspec</groupId>
     <artifactId>ojs-spring</artifactId>
-    <version>0.1.0</version>
+    <version>0.9.0</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```kotlin
-implementation("org.openjobspec:ojs-spring:0.1.0")
+implementation("org.openjobspec:ojs-spring:0.9.0")
 ```
 
 ## Quick Start

@@ -19,7 +19,7 @@ Status definitions: `alpha` (API may change), `beta` (API stable, not battle-tes
 Add any integration as a Gradle dependency:
 
 ```kotlin
-implementation("org.openjobspec:ojs-spring:0.1.0")
+implementation("org.openjobspec:ojs-spring:0.9.0")
 ```
 
 Each module includes an `examples/` directory with a complete working demo using Docker Compose.

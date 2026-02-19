@@ -12,7 +12,7 @@ Bean factory integration for [Open Job Spec](https://github.com/openjobspec/ojs-
 ## Installation
 
 ```kotlin
-implementation("org.openjobspec:ojs-micronaut:0.1.0")
+implementation("org.openjobspec:ojs-micronaut:0.9.0")
 ```
 
 ## Quick Start
