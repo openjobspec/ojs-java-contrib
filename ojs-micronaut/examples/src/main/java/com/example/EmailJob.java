@@ -20,4 +20,3 @@ public class EmailJob {
         return Map.of("sent", true, "to", to);
     }
 }
-
