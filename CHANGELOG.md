@@ -18,4 +18,3 @@ Release candidate for v1.0.
 ### Changed
 
 - Bumped project version to 0.9.0
-
