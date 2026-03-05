@@ -133,3 +133,4 @@ class OjsJobProcessorTest {
         public Object handleTwo(JobContext ctx) { return null; }
     }
 }
+
