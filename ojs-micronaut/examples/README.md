@@ -21,3 +21,4 @@ docker compose up -d
 
 - `POST /jobs/email` — Enqueue an email job
 - `GET /health` — Health check including OJS backend status
+
