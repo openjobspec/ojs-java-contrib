@@ -65,3 +65,8 @@ hs_err_pid*
 *.bak
 *.swp
 *~
+
+# Environment
+.env
+.env.local
+.env.*.local
