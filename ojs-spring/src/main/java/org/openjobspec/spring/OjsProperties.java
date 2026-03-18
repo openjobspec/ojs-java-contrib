@@ -2,7 +2,9 @@ package org.openjobspec.spring;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Configuration properties for OJS, bound from {@code ojs.*} in application.yml/properties.
@@ -17,8 +19,25 @@ import java.util.List;
  *       - default
  *       - email
  *   retry:
- *     max-attempts: 3
- *     backoff: exponential
+ *     max-attempts: 5
+ *     initial-interval: 2s
+ *     backoff-coefficient: 2.0
+ *     max-interval: 10m
+ *     jitter: true
+ *     on-exhaustion: discard
+ *   events:
+ *     enabled: true
+ *   cron:
+ *     sync-on-startup: false
+ *     definitions:
+ *       - name: daily-report
+ *         cron: "0 8 * * *"
+ *         type: report.generate
+ *         queue: reports
+ *   encryption:
+ *     enabled: true
+ *     key: "base64-encoded-32-byte-AES-key"
+ *     key-id: "key-2024"
  * }</pre>
  */
 @ConfigurationProperties(prefix = "ojs")
@@ -44,6 +63,18 @@ public class OjsProperties {
 
     /** Retry configuration. */
     private Retry retry = new Retry();
+
+    /** Events configuration. */
+    private Events events = new Events();
+
+    /** Cron configuration. */
+    private Cron cron = new Cron();
+
+    /** Encryption configuration. */
+    private Encryption encryption = new Encryption();
+
+    /** Retry policy configuration (maps to SDK RetryPolicy). */
+    private OjsRetryProperties retryPolicy = new OjsRetryProperties();
 
     public String getUrl() {
         return url;
@@ -99,6 +130,38 @@ public class OjsProperties {
 
     public void setRetry(Retry retry) {
         this.retry = retry;
+    }
+
+    public Events getEvents() {
+        return events;
+    }
+
+    public void setEvents(Events events) {
+        this.events = events;
+    }
+
+    public Cron getCron() {
+        return cron;
+    }
+
+    public void setCron(Cron cron) {
+        this.cron = cron;
+    }
+
+    public Encryption getEncryption() {
+        return encryption;
+    }
+
+    public void setEncryption(Encryption encryption) {
+        this.encryption = encryption;
+    }
+
+    public OjsRetryProperties getRetryPolicy() {
+        return retryPolicy;
+    }
+
+    public void setRetryPolicy(OjsRetryProperties retryPolicy) {
+        this.retryPolicy = retryPolicy;
     }
 
     /**
@@ -167,6 +230,143 @@ public class OjsProperties {
 
         public void setBackoff(String backoff) {
             this.backoff = backoff;
+        }
+    }
+
+    /** Events configuration properties. */
+    public static class Events {
+
+        /** Whether to enable the OJS event bridge. */
+        private boolean enabled = false;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+    }
+
+    /** Cron configuration properties. */
+    public static class Cron {
+
+        /** Whether to synchronize cron definitions on application startup. */
+        private boolean syncOnStartup = false;
+
+        /** Declarative cron job definitions. */
+        private List<CronDefinition> definitions = new ArrayList<>();
+
+        public boolean isSyncOnStartup() {
+            return syncOnStartup;
+        }
+
+        public void setSyncOnStartup(boolean syncOnStartup) {
+            this.syncOnStartup = syncOnStartup;
+        }
+
+        public List<CronDefinition> getDefinitions() {
+            return definitions;
+        }
+
+        public void setDefinitions(List<CronDefinition> definitions) {
+            this.definitions = definitions;
+        }
+    }
+
+    /** A single cron job definition from properties. */
+    public static class CronDefinition {
+
+        /** Unique name for this cron job. */
+        private String name;
+
+        /** Cron expression (standard 5-field cron). */
+        private String cron;
+
+        /** The OJS job type to enqueue. */
+        private String type;
+
+        /** Target queue (optional). */
+        private String queue;
+
+        /** Job arguments (optional). */
+        private Map<String, Object> args = Map.of();
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getCron() {
+            return cron;
+        }
+
+        public void setCron(String cron) {
+            this.cron = cron;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getQueue() {
+            return queue;
+        }
+
+        public void setQueue(String queue) {
+            this.queue = queue;
+        }
+
+        public Map<String, Object> getArgs() {
+            return args;
+        }
+
+        public void setArgs(Map<String, Object> args) {
+            this.args = args;
+        }
+    }
+
+    /** Encryption configuration properties. */
+    public static class Encryption {
+
+        /** Whether to enable AES-256-GCM encryption. */
+        private boolean enabled = false;
+
+        /** Base64-encoded 32-byte AES key. */
+        private String key;
+
+        /** Key identifier for key rotation. */
+        private String keyId;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public String getKeyId() {
+            return keyId;
+        }
+
+        public void setKeyId(String keyId) {
+            this.keyId = keyId;
         }
     }
 }

@@ -8,8 +8,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+
+import jakarta.annotation.PreDestroy;
 
 /**
  * Auto-configuration for OJS client, worker, template, and supporting beans.
@@ -20,6 +24,10 @@ import org.springframework.context.annotation.Configuration;
  *   <li>Creates an {@link OJSClient} from {@code ojs.url}</li>
  *   <li>Creates an {@link OJSWorker} with auto-registration of {@link OjsJob @OjsJob} handlers</li>
  *   <li>Provides an {@link OjsTemplate} for Spring-style job operations</li>
+ *   <li>Provides an {@link OjsWorkflowTemplate} for workflow orchestration</li>
+ *   <li>Provides an {@link OjsCronBridge} for cron job management</li>
+ *   <li>Configures {@link OjsEventBridge} when {@code ojs.events.enabled=true}</li>
+ *   <li>Configures {@link OjsEncryptionAutoConfiguration} when {@code ojs.encryption.enabled=true}</li>
  *   <li>Configures {@link OjsHealthIndicator} when Spring Actuator is on the classpath</li>
  *   <li>Configures {@link OjsMicrometerMetrics} when Micrometer is on the classpath</li>
  *   <li>Configures {@link OjsTransactionalEnqueue} when Spring TX is on the classpath</li>
@@ -28,6 +36,7 @@ import org.springframework.context.annotation.Configuration;
 @AutoConfiguration
 @EnableConfigurationProperties(OjsProperties.class)
 @ConditionalOnProperty(prefix = "ojs", name = "enabled", havingValue = "true", matchIfMissing = true)
+@Import(OjsEncryptionAutoConfiguration.class)
 public class OjsAutoConfiguration {
 
     @Bean
@@ -57,6 +66,56 @@ public class OjsAutoConfiguration {
     @Bean
     public OjsJobRegistrar ojsJobRegistrar(OJSWorker worker) {
         return new OjsJobRegistrar(worker);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public OjsWorkflowTemplate ojsWorkflowTemplate(OJSClient client) {
+        return new OjsWorkflowTemplate(client);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public OjsCronBridge ojsCronBridge(OJSClient client, OjsProperties properties) {
+        var bridge = new OjsCronBridge(client);
+        if (properties.getCron().isSyncOnStartup()) {
+            bridge.syncFromProperties(properties.getCron().getDefinitions());
+        }
+        return bridge;
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(prefix = "ojs.events", name = "enabled", havingValue = "true")
+    static class OjsEventAutoConfiguration {
+        @Bean
+        @ConditionalOnMissingBean
+        public OjsEventBridge ojsEventBridge(OjsProperties properties,
+                                              ApplicationEventPublisher publisher) {
+            return new OjsEventBridge(properties.getUrl(), publisher);
+        }
+
+        @Bean
+        OjsEventBridgeShutdown ojsEventBridgeShutdown(
+                org.springframework.beans.factory.ObjectProvider<OjsEventBridge> bridgeProvider) {
+            return new OjsEventBridgeShutdown(bridgeProvider);
+        }
+    }
+
+    /** Lifecycle bean that cleans up event subscriptions on shutdown. */
+    static class OjsEventBridgeShutdown {
+        private final org.springframework.beans.factory.ObjectProvider<OjsEventBridge> bridgeProvider;
+
+        OjsEventBridgeShutdown(org.springframework.beans.factory.ObjectProvider<OjsEventBridge> bridgeProvider) {
+            this.bridgeProvider = bridgeProvider;
+        }
+
+        @PreDestroy
+        void shutdown() {
+            var bridge = bridgeProvider.getIfAvailable();
+            if (bridge != null) {
+                bridge.cancelAll();
+            }
+        }
     }
 
     @Configuration(proxyBeanMethods = false)
