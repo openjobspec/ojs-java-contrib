@@ -71,4 +71,108 @@ class OjsConfigurationTest {
         assertEquals(List.of("critical"), config.getQueues());
         assertEquals(100, config.getConcurrency());
     }
+
+    // --- Worker enabled ---
+
+    @Test
+    void defaultWorkerEnabledIsTrue() {
+        var config = new OjsConfiguration();
+        assertTrue(config.isWorkerEnabled());
+    }
+
+    @Test
+    void workerEnabledIsSettable() {
+        var config = new OjsConfiguration();
+        config.setWorkerEnabled(false);
+        assertFalse(config.isWorkerEnabled());
+    }
+
+    // --- Events ---
+
+    @Test
+    void defaultEventsEnabledIsFalse() {
+        var config = new OjsConfiguration();
+        assertFalse(config.isEventsEnabled());
+    }
+
+    @Test
+    void eventsEnabledIsSettable() {
+        var config = new OjsConfiguration();
+        config.setEventsEnabled(true);
+        assertTrue(config.isEventsEnabled());
+    }
+
+    @Test
+    void defaultEventsChannelIsWildcard() {
+        var config = new OjsConfiguration();
+        assertEquals("*", config.getEventsChannel());
+    }
+
+    @Test
+    void eventsChannelIsSettable() {
+        var config = new OjsConfiguration();
+        config.setEventsChannel("jobs");
+        assertEquals("jobs", config.getEventsChannel());
+    }
+
+    // --- Encryption ---
+
+    @Test
+    void defaultEncryptionEnabledIsFalse() {
+        var config = new OjsConfiguration();
+        assertFalse(config.isEncryptionEnabled());
+    }
+
+    @Test
+    void encryptionEnabledIsSettable() {
+        var config = new OjsConfiguration();
+        config.setEncryptionEnabled(true);
+        assertTrue(config.isEncryptionEnabled());
+    }
+
+    @Test
+    void defaultEncryptionKeyIsNull() {
+        var config = new OjsConfiguration();
+        assertNull(config.getEncryptionKey());
+    }
+
+    @Test
+    void encryptionKeyIsSettable() {
+        var config = new OjsConfiguration();
+        config.setEncryptionKey("dGVzdC1rZXk=");
+        assertEquals("dGVzdC1rZXk=", config.getEncryptionKey());
+    }
+
+    @Test
+    void defaultEncryptionKeyIdIsDefault() {
+        var config = new OjsConfiguration();
+        assertEquals("default", config.getEncryptionKeyId());
+    }
+
+    @Test
+    void encryptionKeyIdIsSettable() {
+        var config = new OjsConfiguration();
+        config.setEncryptionKeyId("key-v2");
+        assertEquals("key-v2", config.getEncryptionKeyId());
+    }
+
+    // --- All properties together ---
+
+    @Test
+    void allNewPropertiesCanBeSetTogether() {
+        var config = new OjsConfiguration();
+        config.setWorkerEnabled(false);
+        config.setEventsEnabled(true);
+        config.setEventsChannel("critical");
+        config.setEncryptionEnabled(true);
+        config.setEncryptionKey("c2VjcmV0");
+        config.setEncryptionKeyId("prod-key");
+
+        assertFalse(config.isWorkerEnabled());
+        assertTrue(config.isEventsEnabled());
+        assertEquals("critical", config.getEventsChannel());
+        assertTrue(config.isEncryptionEnabled());
+        assertEquals("c2VjcmV0", config.getEncryptionKey());
+        assertEquals("prod-key", config.getEncryptionKeyId());
+    }
 }
