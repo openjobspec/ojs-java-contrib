@@ -94,12 +94,23 @@ public class OjsWorkflowTemplate {
                                          Workflow.Step onComplete,
                                          Workflow.Step onSuccess,
                                          Workflow.Step onFailure) {
-        var callbacksBuilder = Workflow.callbacks();
-        if (onComplete != null) callbacksBuilder.onComplete(onComplete);
-        if (onSuccess != null) callbacksBuilder.onSuccess(onSuccess);
-        if (onFailure != null) callbacksBuilder.onFailure(onFailure);
+        var callbacks = buildCallbacks(onComplete, onSuccess, onFailure);
         return client.createWorkflow(
-                Workflow.batch(name, callbacksBuilder, steps.toArray(Workflow.Step[]::new)));
+                Workflow.batch(name, callbacks, steps.toArray(Workflow.Step[]::new)));
+    }
+
+    /**
+     * Assemble a batch {@link Workflow.CallbacksBuilder} from the optional lifecycle
+     * callback steps, skipping any that are {@code null}.
+     */
+    private static Workflow.CallbacksBuilder buildCallbacks(Workflow.Step onComplete,
+                                                            Workflow.Step onSuccess,
+                                                            Workflow.Step onFailure) {
+        var callbacks = Workflow.callbacks();
+        if (onComplete != null) callbacks.onComplete(onComplete);
+        if (onSuccess != null) callbacks.onSuccess(onSuccess);
+        if (onFailure != null) callbacks.onFailure(onFailure);
+        return callbacks;
     }
 
     /**
@@ -214,10 +225,7 @@ public class OjsWorkflowTemplate {
                 case CHAIN -> Workflow.chain(name, stepsArray);
                 case GROUP -> Workflow.group(name, stepsArray);
                 case BATCH -> {
-                    var cb = Workflow.callbacks();
-                    if (onComplete != null) cb.onComplete(onComplete);
-                    if (onSuccess != null) cb.onSuccess(onSuccess);
-                    if (onFailure != null) cb.onFailure(onFailure);
+                    var cb = buildCallbacks(onComplete, onSuccess, onFailure);
                     yield Workflow.batch(name, cb, stepsArray);
                 }
             };
