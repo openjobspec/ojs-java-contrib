@@ -45,7 +45,9 @@ public class OjsJobRegistrar implements BeanPostProcessor {
             var annotation = method.getAnnotation(OjsJob.class);
             if (annotation != null) {
                 String jobType = resolveJobType(annotation);
-                worker.register(jobType, ctx -> invokeHandler(bean, method, ctx));
+                if (!jobType.isEmpty()) {
+                    worker.register(jobType, ctx -> invokeHandler(bean, method, ctx));
+                }
             }
         }
         return bean;

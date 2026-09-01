@@ -56,6 +56,17 @@ class OjsJobRegistrarTest {
     }
 
     @Test
+    void skipsMethodLevelAnnotationWithEmptyType() {
+        var registrar = new OjsJobRegistrar(worker);
+        var bean = new EmptyTypeMethodBean();
+
+        registrar.postProcessAfterInitialization(bean, "emptyTypeMethodBean");
+
+        // Consistent with the class-level path, an empty job type must not be registered.
+        verify(worker, never()).register(any(), any());
+    }
+
+    @Test
     void returnsSameBeanInstance() {
         var registrar = new OjsJobRegistrar(worker);
         var bean = new PlainBean();
@@ -84,5 +95,12 @@ class OjsJobRegistrarTest {
 
     static class PlainBean {
         public void doSomething() {}
+    }
+
+    static class EmptyTypeMethodBean {
+        @OjsJob
+        public Object handle(org.openjobspec.ojs.JobContext ctx) {
+            return null;
+        }
     }
 }
