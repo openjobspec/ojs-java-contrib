@@ -1,6 +1,5 @@
 package org.openjobspec.spring;
 
-import org.openjobspec.ojs.JobContext;
 import org.openjobspec.ojs.OJSWorker;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -46,7 +45,7 @@ public class OjsJobRegistrar implements BeanPostProcessor {
             if (annotation != null) {
                 String jobType = resolveJobType(annotation);
                 if (!jobType.isEmpty()) {
-                    worker.register(jobType, ctx -> invokeHandler(bean, method, ctx));
+                    worker.register(jobType, new ReflectiveJobHandler(bean, method));
                 }
             }
         }
@@ -59,17 +58,5 @@ public class OjsJobRegistrar implements BeanPostProcessor {
             type = annotation.value();
         }
         return type != null ? type : "";
-    }
-
-    private Object invokeHandler(Object bean, Method method, JobContext ctx) throws Exception {
-        try {
-            if (!method.canAccess(bean)) {
-                method.setAccessible(true);
-            }
-            return method.invoke(bean, ctx);
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            if (e.getCause() instanceof Exception ex) throw ex;
-            throw new RuntimeException("Job handler threw non-exception throwable", e.getCause());
-        }
     }
 }
