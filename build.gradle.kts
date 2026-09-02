@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.bundling.AbstractArchiveTask
+
 plugins {
     java
     `java-library`
@@ -43,17 +45,36 @@ subprojects {
         useJUnitPlatform()
     }
 
+    tasks.withType<AbstractArchiveTask>().configureEach {
+        isPreserveFileTimestamps = false
+        isReproducibleFileOrder = true
+    }
+
     publishing {
         publications {
             create<MavenPublication>("maven") {
                 from(components["java"])
                 pom {
+                    name.set(project.name)
+                    description.set(project.description)
                     url.set("https://github.com/openjobspec/ojs-java-contrib")
                     licenses {
                         license {
                             name.set("Apache License 2.0")
                             url.set("https://www.apache.org/licenses/LICENSE-2.0")
                         }
+                    }
+                    developers {
+                        developer {
+                            name.set("OpenJobSpec Contributors")
+                            organization.set("OpenJobSpec")
+                            organizationUrl.set("https://openjobspec.org")
+                        }
+                    }
+                    scm {
+                        connection.set("scm:git:https://github.com/openjobspec/ojs-java-contrib.git")
+                        developerConnection.set("scm:git:ssh://git@github.com/openjobspec/ojs-java-contrib.git")
+                        url.set("https://github.com/openjobspec/ojs-java-contrib")
                     }
                 }
             }
