@@ -6,29 +6,57 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
+env:
+  OJS_JAVA_SDK_SHA: effc08c82626cbe297d613999f1772383c1d29ab
+
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         java: [21]
-        module: [ojs-spring, ojs-quarkus, ojs-micronaut]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
-      - uses: actions/setup-java@v4
+      - name: Validate coordinated SDK revision
+        run: |
+          if ! [[ "$OJS_JAVA_SDK_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::Replace OJS_JAVA_SDK_SHA with the immutable 40-character pre-release SDK commit"
+            exit 1
+          fi
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          repository: openjobspec/ojs-java-sdk
+          ref: ${{ env.OJS_JAVA_SDK_SHA }}
+          path: dependency/ojs-java-sdk
+
+      - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
+          cache: gradle
 
-      - uses: gradle/actions/setup-gradle@v3
+      - uses: gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d # v4
 
-      - name: Build ${{ matrix.module }}
-        run: ./gradlew :${{ matrix.module }}:build
+      - name: Install coordinated Java SDK
+        run: |
+          mvn -B -f dependency/ojs-java-sdk/pom.xml install \
+            -DskipTests \
+            -Djacoco.skip=true \
+            -Dmaven.javadoc.skip=true
 
-      - name: Test ${{ matrix.module }}
-        run: ./gradlew :${{ matrix.module }}:test
+      - name: Verify Gradle wrapper
+        run: ./gradlew --no-daemon --version
 
-      - name: Dependency check ${{ matrix.module }}
-        run: ./gradlew :${{ matrix.module }}:dependencyCheckAnalyze
-        continue-on-error: true
+      - name: Build and test
+        run: ./gradlew --no-daemon clean check
+
+      - name: Publish dry run
+        run: ./gradlew --no-daemon publishToMavenLocal
+
+      - name: Consumer smoke
+        run: ./gradlew --no-daemon -p consumer-smoke clean build
