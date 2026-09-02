@@ -1,5 +1,5 @@
 # Open Job Spec — Java Contrib
-[![Stability: beta](https://img.shields.io/badge/stability-beta-yellow.svg)](https://github.com/openjobspec/openjobspec/blob/main/STABILITY.md)
+![Stability: beta](https://img.shields.io/badge/stability-beta-yellow.svg)
 
 [![CI](https://github.com/openjobspec/ojs-java-contrib/actions/workflows/ci.yml/badge.svg)](https://github.com/openjobspec/ojs-java-contrib/actions/workflows/ci.yml)
 
@@ -17,10 +17,17 @@ Status definitions: `alpha` (API may change), `beta` (API stable, not battle-tes
 
 ## Getting Started
 
-Add any integration as a Gradle dependency:
+The 0.5.0 artifacts are not currently available from Maven Central. From a
+source checkout, publish them to your local Maven repository first:
+
+```bash
+./gradlew --no-daemon clean check publishToMavenLocal
+```
+
+Then add an integration as a Gradle dependency:
 
 ```kotlin
-implementation("org.openjobspec:ojs-spring:0.9.0")
+implementation("org.openjobspec:ojs-spring:0.5.0")
 ```
 
 Each module includes an `examples/` directory with a complete working demo using Docker Compose.
@@ -28,7 +35,9 @@ Each module includes an `examples/` directory with a complete working demo using
 ## Building
 
 ```bash
-./gradlew build
+./gradlew --no-daemon clean check
+./gradlew --no-daemon publishToMavenLocal
+./gradlew --no-daemon -p consumer-smoke clean build
 ```
 
 ## Contributing
@@ -38,4 +47,3 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on adding new contrib pa
 ## License
 
 Apache 2.0 — see [LICENSE](./LICENSE).
-

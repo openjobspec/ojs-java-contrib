@@ -45,5 +45,5 @@ Each example should include:
 ## Pull Request Process
 
 1. Fork the repository and create a feature branch.
-2. Ensure all tests pass: `./gradlew test`
+2. Ensure all checks pass: `./gradlew --no-daemon clean check`
 3. Submit a pull request with a clear description.

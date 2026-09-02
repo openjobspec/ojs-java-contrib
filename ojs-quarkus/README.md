@@ -11,8 +11,12 @@ CDI extension for [Open Job Spec](https://github.com/openjobspec/ojs-java-sdk) w
 
 ## Installation
 
+The artifact is not yet on Maven Central. Run
+`./gradlew publishToMavenLocal` from the repository root before using these
+coordinates locally.
+
 ```kotlin
-implementation("org.openjobspec:ojs-quarkus:0.9.0")
+implementation("org.openjobspec:ojs-quarkus:0.5.0")
 ```
 
 ## Quick Start
