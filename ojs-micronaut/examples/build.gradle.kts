@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.openjobspec:ojs-micronaut:0.1.0")
+    implementation("org.openjobspec:ojs-micronaut:0.5.0")
     implementation("io.micronaut:micronaut-http-server-netty:4.5.0")
     implementation("io.micronaut:micronaut-management:4.5.0")
 }
