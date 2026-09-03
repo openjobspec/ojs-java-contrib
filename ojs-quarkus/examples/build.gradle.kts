@@ -18,7 +18,8 @@ repositories {
 }
 
 dependencies {
-    implementation("org.openjobspec:ojs-quarkus:0.1.0")
+    implementation(enforcedPlatform("io.quarkus.platform:quarkus-bom:3.11.0"))
+    implementation("org.openjobspec:ojs-quarkus:0.5.0")
     implementation("io.quarkus:quarkus-rest-jackson:3.11.0")
     implementation("io.quarkus:quarkus-smallrye-health:3.11.0")
 }

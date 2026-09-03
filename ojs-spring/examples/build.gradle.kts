@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.openjobspec:ojs-spring:0.1.0")
+    implementation("org.openjobspec:ojs-spring:0.5.0")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 }

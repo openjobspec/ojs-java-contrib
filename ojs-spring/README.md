@@ -15,20 +15,24 @@ Auto-configuration starter for [Open Job Spec](https://github.com/openjobspec/oj
 
 ## Installation
 
+The artifact is not yet on Maven Central. Run
+`./gradlew publishToMavenLocal` from the repository root before using these
+coordinates locally.
+
 ### Maven
 
 ```xml
 <dependency>
     <groupId>org.openjobspec</groupId>
     <artifactId>ojs-spring</artifactId>
-    <version>0.9.0</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```kotlin
-implementation("org.openjobspec:ojs-spring:0.9.0")
+implementation("org.openjobspec:ojs-spring:0.5.0")
 ```
 
 ## Quick Start

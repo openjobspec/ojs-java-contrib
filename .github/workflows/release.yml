@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          repository: openjobspec/ojs-java-sdk
+          ref: v0.5.0
+          path: dependency/ojs-java-sdk
+
+      - uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - uses: gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d # v4
+
+      - name: Install coordinated Java SDK
+        run: |
+          mvn -B -f dependency/ojs-java-sdk/pom.xml install \
+            -DskipTests \
+            -Djacoco.skip=true \
+            -Dmaven.javadoc.skip=true
+
+      - name: Verify release version
+        if: github.ref_type == 'tag'
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PROJECT_VERSION="$(sed -n 's/^version=//p' gradle.properties)"
+          SDK_VERSION="$(sed -n 's/^ojsSdkVersion=//p' gradle.properties)"
+          test "$TAG_VERSION" = "$PROJECT_VERSION" && test "$TAG_VERSION" = "$SDK_VERSION" || {
+            echo "::error::Tag version $TAG_VERSION must match the package and SDK dependency versions"
+            exit 1
+          }
+
+      - name: Build and publish dry run
+        run: |
+          ./gradlew --no-daemon clean check publishToMavenLocal
+          ./gradlew --no-daemon -p consumer-smoke clean build
+
+      - name: Create GitHub release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2
+        with:
+          generate_release_notes: true
+          files: |
+            ojs-spring/build/libs/*.jar
+            ojs-quarkus/build/libs/*.jar
+            ojs-micronaut/build/libs/*.jar

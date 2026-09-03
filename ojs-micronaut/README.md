@@ -11,8 +11,12 @@ Bean factory integration for [Open Job Spec](https://github.com/openjobspec/ojs-
 
 ## Installation
 
+The artifact is not yet on Maven Central. Run
+`./gradlew publishToMavenLocal` from the repository root before using these
+coordinates locally.
+
 ```kotlin
-implementation("org.openjobspec:ojs-micronaut:0.9.0")
+implementation("org.openjobspec:ojs-micronaut:0.5.0")
 ```
 
 ## Quick Start
